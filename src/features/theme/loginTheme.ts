@@ -2,6 +2,9 @@ import { createTheme } from '@mui/material/styles';
 import {ThemeMode} from "./themeTypes.ts";
 
 export const getLoginTheme = (mode: ThemeMode) => createTheme({
+    typography: {
+      fontFamily: '"Inter", sans-serif',
+    },
     palette: {
         mode,
         primary: {

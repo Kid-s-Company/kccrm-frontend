@@ -13,8 +13,9 @@ import AdbIcon from '@mui/icons-material/Adb';
 import {useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import ThemeSwitch from "../../components/ThemeSwitch.tsx";
-import {useAppSelector} from "../../store/store.ts";
+import {useAppSelector, useAppDispatch} from "../../store/store.ts";
 import LanguageDialog from "../../multilingual/languageDialog.tsx";
+import {logout} from "../../../features/account/authSlice.ts";
 
 const pages = ['Home', 'Products', 'Pricing', 'Contact'];
 
@@ -22,8 +23,10 @@ const AuthNavBar = React.forwardRef<HTMLElement>(
     (_, ref) => {
         const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
         const themeMode = useAppSelector((state) => state.theme.mode);
-        const {t} = useTranslation();
+        const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+        const dispatch = useAppDispatch();
 
+        const {t} = useTranslation();
         const navigate = useNavigate();
 
         const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -32,6 +35,11 @@ const AuthNavBar = React.forwardRef<HTMLElement>(
 
         const handleCloseNavMenu = () => {
             setAnchorElNav(null);
+        };
+
+        const handleLogout = () => {
+            dispatch(logout());
+            navigate('/');
         };
 
         return (
@@ -48,16 +56,12 @@ const AuthNavBar = React.forwardRef<HTMLElement>(
                                 component="a"
                                 href="#app-bar-with-responsive-menu"
                                 sx={{
-                                    mr: 2,
                                     display: {xs: 'none', md: 'flex'},
-                                    fontFamily: 'monospace',
-                                    fontWeight: 700,
-                                    letterSpacing: '.3rem',
                                     color: 'inherit',
                                     textDecoration: 'none',
                                 }}
                             >
-                                LOGO
+                                IntelliPair
                             </Typography>
                         </Box>
 
@@ -107,7 +111,6 @@ const AuthNavBar = React.forwardRef<HTMLElement>(
                                 href="#app-bar-with-responsive-menu"
                                 sx={{
                                     display: {xs: 'flex', md: 'none'},
-                                    //flexGrow: 1,
                                     fontFamily: 'monospace',
                                     fontWeight: 700,
                                     letterSpacing: '.3rem',
@@ -138,14 +141,27 @@ const AuthNavBar = React.forwardRef<HTMLElement>(
                                 <ThemeSwitch/>
                                 <LanguageDialog/>
                             </Box>
-                            <Button variant='lightContained' size='small' disableElevation
-                                    sx={{maxWidth: '86px', maxHeight: '64px'}}
-                                    onClick={() => navigate('signup')}
-                            >{t('Sign up')}</Button>
-                            <Button variant='contained' size='small' disableElevation
-                                    sx={{display: {xs: 'none', md: 'block'}}}
-                                    onClick={() => navigate('login')}
-                            >{t('Sign in')}</Button>
+                            {isAuthenticated ? (
+                                <Button variant='contained' size='small' disableElevation
+                                        onClick={handleLogout}>
+                                    {t('Logout')}
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button variant='lightContained' size='small' disableElevation
+                                            sx={{maxWidth: '86px', maxHeight: '64px'}}
+                                            onClick={() => navigate('signup')}
+                                    >
+                                        {t('Sign up')}
+                                    </Button>
+                                    <Button variant='contained' size='small' disableElevation
+                                            sx={{display: {xs: 'none', md: 'block'}}}
+                                            onClick={() => navigate('login')}
+                                    >
+                                        {t('Sign in')}
+                                    </Button>
+                                </>
+                            )}
                         </Box>
                     </Toolbar>
                 </Container>
